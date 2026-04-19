@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NEURARG TV</title>
+
+<style>
+body{
+  margin:0;
+  background:#0b0b0b;
+  color:white;
+  font-family:Arial;
+}
+
+.header{
+  padding:15px;
+  font-size:22px;
+}
+
+.timeline{
+  display:flex;
+  margin-left:150px;
+  color:#aaa;
+  font-size:12px;
+}
+
+.row{
+  display:flex;
+  margin-bottom:8px;
+}
+
+.channel{
+  width:150px;
+  padding:5px;
+  font-weight:bold;
+}
+
+.program{
+  width:200px;
+  background:#1a1a1a;
+  margin-right:4px;
+  padding:6px;
+  border-radius:6px;
+  font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">📺 NEURARG TV</div>
+
+<div class="timeline" id="timeline"></div>
+<div id="grid"></div>
+
+<script>
+const canales = [
+  {id:"Telefe.ar", nombre:"Telefe"},
+  {id:"ElTrece.ar", nombre:"El Trece"},
+  {id:"AmericaTV.ar", nombre:"América"},
+  {id:"TVPublica.ar", nombre:"TV Pública"},
+  {id:"C5N.ar", nombre:"C5N"},
+  {id:"TN.ar", nombre:"TN"}
+];
+
+function timeline(){
+  let now = new Date();
+  let html="";
+  for(let i=0;i<6;i++){
+    let h = new Date(now.getTime()+i*3600000);
+    html += `<div style="width:200px;">${h.getHours()}:00</div>`;
+  }
+  document.getElementById("timeline").innerHTML = html;
+}
+
+async function load(){
+  let res = await fetch("https://iptv-org.github.io/epg/guides/ar.xml");
+  let text = await res.text();
+  let xml = new DOMParser().parseFromString(text,"text/xml");
+
+  let html="";
+
+  canales.forEach(c=>{
+    let progs = [...xml.querySelectorAll(`programme[channel="${c.id}"]`)].slice(0,6);
+
+    html += `<div class="row">`;
+    html += `<div class="channel">${c.nombre}</div>`;
+
+    progs.forEach(p=>{
+      let t = p.querySelector("title")?.textContent || "";
+      html += `<div class="program">${t}</div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  document.getElementById("grid").innerHTML = html;
+}
+
+timeline();
+load();
+setInterval(load,60000);
+</script>
+
+</body>
+</html>
