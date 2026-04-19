@@ -86,7 +86,7 @@ function generarTimeline(){
 
 async function cargar(){
   try{
-    let res = await fetch("https://iptv-org.github.io/epg/guides/ar.xml");
+    let res = await fetch("https://api.allorigins.win/raw?url=https://iptv-org.github.io/epg/guides/ar.xml");
     let text = await res.text();
     let xml = new DOMParser().parseFromString(text,"text/xml");
 
